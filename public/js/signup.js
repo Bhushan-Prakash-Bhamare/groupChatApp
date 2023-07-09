@@ -36,6 +36,7 @@ async function formSubmit(e){
     }
     catch(err){
         console.log(err);
+        
         form.innerHTML +=`<div style="color:red;">${err.name}</div>`;
     }
 }

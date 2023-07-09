@@ -24,7 +24,8 @@ async function formSubmit(e){
       }
       
       const response=await axios.post(`http://localhost:3100/user/login`,details);  
-          console.log(response.data.message);  
+          console.log(response.data.message); 
+          localStorage.setItem('token',response.data.token); 
       
   }
   catch(err){ 
