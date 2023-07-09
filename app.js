@@ -5,7 +5,11 @@ const bodyParser = require('body-parser');
 const sequelize=require('./util/database');
 const app = express();
 
-app.use(cors());
+app.use(cors(
+    {
+        origin:"http://127.0.0.1:5500"
+    }
+));
 
 const userRoute=require('./routes/user');
  
