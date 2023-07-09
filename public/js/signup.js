@@ -25,10 +25,9 @@ async function formSubmit(e){
             password:e.target.password.value
         }
         
-        const response=await axios.post(`http://13.51.204.19:3100/user/signup`,details);
+        const response=await axios.post(`http://localhost:3100/user/signup`,details);
         if(response.status===201){
-        //     console.log("success:User added"); 
-        //     window.location.href="../html/login.html" ; 
+            console.log("success:User added"); 
         }
         else{
             throw new error('Something went wrong');
@@ -36,6 +35,6 @@ async function formSubmit(e){
     }
     catch(err){
         console.log(err);
-        form.body.innerHTML +=`<div style="color:red;">${err.name}</div>`;
+        form.innerHTML +=`<div style="color:red;">${err.name}</div>`;
     }
 }
