@@ -78,3 +78,14 @@ exports.login=async(req,res,next)=>{
         res.status(500).json({message:err,success:false,});
     }
 }
+
+exports.getuser=async(req,res,next)=>{
+    try{
+        const userId=req.params.UserId;
+        const data=await userModel.findByPk(userId);
+        res.status(201).json({userData:data,success:true});
+    }
+    catch(err){ 
+        res.status(500).json({error:err,success:false});
+    }
+}

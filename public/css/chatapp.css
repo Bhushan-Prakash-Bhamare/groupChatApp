@@ -1,0 +1,31 @@
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+#Dataform{
+    height: 80px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+.form .field{
+    height: 70px;
+}
+.field input{
+    height: 100%;
+    width: 70%;
+    border: 1px solid ;
+    font-size: 16px;
+    font-weight: 400;
+    border-radius: 6px;
+}
+.field button{
+    height: 100%;
+    width: 20%;
+    border: none;
+    font-size: 16px;
+    font-weight: 400;
+    border-radius: 6px;
+}

@@ -12,11 +12,13 @@ app.use(cors(
 ));
 
 const userRoute=require('./routes/user');
+const messageRoute=require('./routes/message');
  
 app.use(bodyParser.json());
 // app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/user',userRoute);
+app.use('/message',messageRoute);
 
 sequelize
         .sync()

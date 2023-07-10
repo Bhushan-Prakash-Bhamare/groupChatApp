@@ -26,9 +26,9 @@ async function formSubmit(e){
         }
         
         const response=await axios.post(`http://localhost:3100/user/signup`,details);
-        if(response.status===201){
-            console.log("success:User added"); 
+        if(response.status===201){ 
             alert('Successfuly signed up');
+            window.location.href="../html/login.html" ; 
         }
         else{
             throw new error('Something went wrong');
