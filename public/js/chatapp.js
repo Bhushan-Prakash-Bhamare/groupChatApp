@@ -13,18 +13,25 @@ function parseJwt (token) {
     return JSON.parse(jsonPayload);
 }
 
-window.addEventListener("DOMContentLoaded",async()=>{
+async function getmessages(){
     try{
         const token=localStorage.getItem('token');
         const allMsgs=await axios.get("http://localhost:3100/message/get-message",{ headers:{"Authorization":token}});
-        console.log(allMsgs);
+        chatList.innerHTML='';
         for(var i=0;i<allMsgs.data.messageData.length;i++)
            await showmsg(allMsgs.data.messageData[i]);
      }
      catch(error){
          console.log(error)
      };
+}
+window.addEventListener("DOMContentLoaded",()=>{
+    showmsg()
+    getmessages();
+    setInterval(getmessages,1000);   
  })
+
+ 
 
 async function formSubmit(e){
     try{
