@@ -1,4 +1,5 @@
 const messageModel=require('../models/message');
+const { Op } = require("sequelize");
 
 function isstringinvalid(string){
     if(string==undefined||string.length==0){
@@ -26,7 +27,9 @@ exports.addMsg=async(req, res, next)=>{
 
 exports.getMsgs=async(req, res, next)=>{
     try{ 
-        const data= await messageModel.findAll();
+        const lastMsgId=req.query.lastMsgID;
+        console.log(lastMsgId);
+        const data= await messageModel.findAll({where: {id:{[Op.gt]: lastMsgId }}});
         res.status(201).json({messageData:data,success:true,});
     }
     catch(err){ 

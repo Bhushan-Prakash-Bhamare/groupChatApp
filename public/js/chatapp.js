@@ -15,19 +15,49 @@ function parseJwt (token) {
 
 async function getmessages(){
     try{
+        
         const token=localStorage.getItem('token');
-        const allMsgs=await axios.get("http://localhost:3100/message/get-message",{ headers:{"Authorization":token}});
-        chatList.innerHTML='';
+        const msgarray=localStorage.getItem('msgs');
+        const parsedMsgs=JSON.parse(msgarray);
+        if(parsedMsgs!=null && parsedMsgs.length>10){
+            parsedMsgs.shift();
+        }
+        let mergedArrays;
+        let msgId=-1;
+        if(parsedMsgs.length>0){  
+            parsedMsgs.forEach(element => {
+                msgId=element.id;
+             }); 
+        } 
+        const allMsgs=await axios.get(`http://localhost:3100/message/get-message?lastMsgID=${msgId}`);
+        if(parsedMsgs.length>0 && allMsgs.data.messageData.length>0){
+            mergedArrays=parsedMsgs.concat(allMsgs.data.messageData);
+        }
+        else if(parsedMsgs.length==0 && allMsgs.data.messageData.length>0){
+            mergedArrays=allMsgs.data.messageData;
+        }
+        else if(parsedMsgs.length>0 && allMsgs.data.messageData.length==0){
+            mergedArrays=parsedMsgs;
+        }
+        else{
+            mergedArrays=[];
+        }
+        const msgString=JSON.stringify(mergedArrays);
+        localStorage.setItem('msgs',msgString);
         for(var i=0;i<allMsgs.data.messageData.length;i++)
-           await showmsg(allMsgs.data.messageData[i]);
+            await showmsg(allMsgs.data.messageData[i]);
+       
      }
      catch(error){
          console.log(error)
      };
 }
-window.addEventListener("DOMContentLoaded",()=>{
-    showmsg()
-    getmessages();
+window.addEventListener("DOMContentLoaded",async()=>{
+    const allMsgs=await axios.get(`http://localhost:3100/message/get-message?lastMsgID=0`);
+    const msgString=JSON.stringify(allMsgs.data.messageData);
+    localStorage.setItem('msgs',msgString);
+    for(var i=0;i<allMsgs.data.messageData.length;i++)
+            await showmsg(allMsgs.data.messageData[i]);
     setInterval(getmessages,1000);   
  })
 
@@ -38,13 +68,23 @@ async function formSubmit(e){
         e.preventDefault();
         const messageData=e.target.message.value;
         e.target.message.value='';
+        const msgArray=localStorage.getItem('msgs');
+        const msgArrayParsed=JSON.parse(msgArray);
         const token=localStorage.getItem('token');
         let obj={
             messageData
         }
         const response=await axios.post("http://localhost:3100/message/add-message",obj,{headers:{"Authorization":token}})
+        if(msgArray!=null){
+            msgArrayParsed.push(response.data.messageData);
+            msgStringArray=JSON.stringify(msgArrayParsed);
+            localStorage.setItem('msgs',msgStringArray);
+        }
+        else{
+            msgStringArray=JSON.stringify(response.data.messageData);
+            localStorage.setItem('msgs',msgStringArray);
+        }
         showmsg(response.data.messageData);
-       console.log(response.data.messageData);
     }
     catch(err){
         console.log(err);
