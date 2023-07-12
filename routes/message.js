@@ -6,6 +6,6 @@ const router = express.Router();
 
 router.post('/add-message',userauthentication.authenticate,messageController.addMsg);
 
-router.get('/get-message',messageController.getMsgs)
+router.get('/get-message/:groupId',messageController.getMsgs)
 
 module.exports = router; 

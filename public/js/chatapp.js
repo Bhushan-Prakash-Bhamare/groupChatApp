@@ -1,5 +1,15 @@
 const chatList=document.getElementById('chatList');
+const groupList=document.getElementById('groupList');
+const memberList=document.getElementById('memberList');
+const addGroupBtn=document.getElementById('groupBtn');
 const messageInput=document.getElementById('Dataform');
+const addGroupDisplay=document.getElementById('addgrp');
+
+addGroupBtn.addEventListener('click',()=>{
+    addGroupDisplay.style.display='block'
+});
+
+addGroupDisplay.addEventListener('submit',AddGroup);
 
 messageInput.addEventListener('submit',formSubmit);
 
@@ -19,7 +29,7 @@ async function getmessages(){
         const token=localStorage.getItem('token');
         const msgarray=localStorage.getItem('msgs');
         const parsedMsgs=JSON.parse(msgarray);
-        if(parsedMsgs!=null && parsedMsgs.length>10){
+        while(parsedMsgs!=null && parsedMsgs.length>10){
             parsedMsgs.shift();
         }
         let mergedArrays;
@@ -49,16 +59,23 @@ async function getmessages(){
        
      }
      catch(error){
-         console.log(error)
+         console.log(error);
      };
 }
 window.addEventListener("DOMContentLoaded",async()=>{
-    const allMsgs=await axios.get(`http://localhost:3100/message/get-message?lastMsgID=0`);
-    const msgString=JSON.stringify(allMsgs.data.messageData);
-    localStorage.setItem('msgs',msgString);
-    for(var i=0;i<allMsgs.data.messageData.length;i++)
-            await showmsg(allMsgs.data.messageData[i]);
-    setInterval(getmessages,1000);   
+    const token=localStorage.getItem('token');
+    // const allMsgs=await axios.get(`http://localhost:3100/message/get-message?lastMsgID=0`);
+    // const msgString=JSON.stringify(allMsgs.data.messageData);
+    // localStorage.setItem('msgs',msgString);
+    // for(var i=0;i<allMsgs.data.messageData.length;i++)
+    //         await showmsg(allMsgs.data.messageData[i]);
+    
+    const response=await axios.get("http://localhost:3100/group/get-group",{headers:{"Authorization":token}});
+    // console.log(response);
+    for(var i=0;i<response.data.groupData.length;i++)
+            await showgrps(response.data.groupData[i]);
+
+    // setInterval(getmessages,1000);   
  })
 
  
@@ -71,8 +88,9 @@ async function formSubmit(e){
         const msgArray=localStorage.getItem('msgs');
         const msgArrayParsed=JSON.parse(msgArray);
         const token=localStorage.getItem('token');
+        const groupId=localStorage.getItem('groupId');
         let obj={
-            messageData
+            messageData,groupId
         }
         const response=await axios.post("http://localhost:3100/message/add-message",obj,{headers:{"Authorization":token}})
         if(msgArray!=null){
@@ -110,6 +128,122 @@ async function showmsg(obj){
         addNewelem.appendChild(text);
         chatList.appendChild(addNewelem);
 
+    }
+    catch(error){
+        console.log(error)
+    };
+}
+
+async function AddGroup(e){
+    e.preventDefault();
+    const token=localStorage.getItem('token');
+    addGroupDisplay.style.display='none';
+    const groupName=e.target.grpname.value;
+    // const email=e.target.email.value; 
+    let obj={
+        groupName
+    }
+    const response=await axios.post("http://localhost:3100/group/add-group",obj,{headers:{"Authorization":token}});
+    // console.log(response.data.groupData);
+    showgrps(response.data.groupData);
+    
+}
+
+async function showgrps(myobj){
+    try{
+        const addNewelem=document.createElement('li');
+        addNewelem.className="list-group-item bg-light border border-dark border-1";
+        const text=document.createTextNode(myobj.name);
+        addNewelem.style.fontSize='25px';
+        addNewelem.appendChild(text);
+        const brTag=document.createElement('br');
+        addNewelem.appendChild(brTag);
+
+        const addMemberbtn=document.createElement('button');
+        addMemberbtn.className='btn btn-danger btn-sm'
+        addMemberbtn.appendChild(document.createTextNode('Add Member'));
+        addNewelem.appendChild(addMemberbtn);
+
+        const memberForm=document.createElement('form');
+        memberForm.setAttribute("style", "display:none;");
+        memberForm.className="mt-3"
+        let userName = document.createElement("input");
+        userName.className="form-control"
+        userName.setAttribute("placeholder", "Phone Number");
+        userName.setAttribute("name", "PhoneNo");
+        memberForm.appendChild(userName);
+        var sBtn = document.createElement("input");
+        sBtn.className="btn btn-dark"
+         sBtn.setAttribute("value", "Add");
+         sBtn.setAttribute("type", "submit");
+         memberForm.appendChild(sBtn);
+        addNewelem.appendChild(memberForm);
+
+        
+        groupList.appendChild(addNewelem);
+
+        memberForm.addEventListener('submit',async(e)=>{
+            try{
+                e.preventDefault();
+                const phoneNo=e.target.PhoneNo.value;
+                const gId=localStorage.getItem('groupId');
+                e.target.PhoneNo.value="";
+                // console.log(phoneNo);
+                const addMember=await axios.get(`http://localhost:3100/group/add-user?phoneNo=${phoneNo}&groupId=${gId}`);
+                memberForm.innerHTML+=`<h5 class="text-center" style="color:green;">User Added</h5>`
+                setTimeout(()=>{
+                   memberForm.setAttribute("style", "display:none;");
+                },2000)
+
+            }
+            catch(err){
+                console.log(err);
+            }
+        });
+
+        addNewelem.addEventListener('click',async()=>{
+            try{
+                localStorage.setItem('groupId',myobj.id);
+                const token=localStorage.getItem('token');
+                const groupId=myobj.id;
+                const allMsgs=await axios.get(`http://localhost:3100/message/get-message/${groupId}`,{headers:{"Authorization":token}});
+                const msgString=JSON.stringify(allMsgs.data.messageData);
+                localStorage.setItem('msgs',msgString);
+                chatList.innerHTML='';
+                for(var i=0;i<allMsgs.data.messageData.length;i++)
+                    await showmsg(allMsgs.data.messageData[i]);
+                const grpMembers=await axios.get(`http://localhost:3100/group/get-members/${groupId}`);
+                memberList.innerHTML='';
+                for(var i=0;i<grpMembers.data.members.length;i++)
+                    await showMembers(grpMembers.data.members[i]);
+                // console.log(grpMembers);
+            }
+            catch(err){
+                console.log(err);
+            }
+        })        
+        addMemberbtn.addEventListener('click',async function(){
+            try{
+
+                memberForm.setAttribute("style", "display:block;");
+            }
+            catch(err){
+                console.log(err)
+            };     
+        })
+        }
+        catch(error){
+            console.log(error)
+        };   
+}
+
+async function showMembers(obj){
+    try{
+        const addNewelem=document.createElement('li');
+        addNewelem.className="list-group-item bg-light";
+        text=document.createTextNode(obj.name);    
+        addNewelem.appendChild(text);
+        memberList.appendChild(addNewelem);
     }
     catch(error){
         console.log(error)

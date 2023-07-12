@@ -12,10 +12,32 @@
         <div class="fixed-top ">
             <h1 class="text-center fw-bolder bg-danger text-light">Chat App </h1>
         </div><br>
-        <div class="mt-5">
-            <ul class="list-group" id="chatList">
-            </ul>
-        </div><br><br><br><br><br><br>
+        <div class="row">
+            <div class="col-4 mt-5">
+                <div class="bg-info d-flex ">
+                    <h2 class="col-9 text-center">GROUPS</h2>
+                    <button class="btn btn-dark " id="groupBtn">Add Group</button>
+                </div>
+                <form class="bg-info " id="addgrp" style="display: none;" >
+                    <label class="form-label mx-4 fw-bolder">Group name</label>
+                    <input class="form-control w-75 mx-4" type="text" name="grpname">
+                    <button class="btn btn-warning mx-4 mt-2" id="submitGrpBtn">Add</button><br><br>
+                </form>
+                <ul class="list-group" id="groupList">
+                </ul><br>
+                <div>
+                    <h3 class="list-group text-center bg-warning text-light">Members</h3>
+                    <ul class="list-group" id="memberList">
+                    </ul>
+                </div>
+                
+            </div>
+            <div class="offset-1 mt-5 col-7">
+                <ul class="list-group" id="chatList">
+                </ul>
+            </div>
+        </div>
+        <br><br><br><br><br><br>
         <div class="fixed-bottom  bg-dark ">
             <form class=" col-8 my-4 mx-auto" id="Dataform">
                 <div class="d-flex  ">
