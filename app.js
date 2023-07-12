@@ -3,7 +3,9 @@ const cors = require('cors');
 const express = require('express');
 const bodyParser = require('body-parser');
 const sequelize=require('./util/database');
-const app = express();
+const helmet=require('helmet');
+const morgan=require('morgan');
+const fs=require('fs');
 
 const userRoute=require('./routes/user');
 const messageRoute=require('./routes/message');
@@ -14,6 +16,13 @@ const Message=require('./models/message');
 const Group=require('./models/group');
 const UserGroup=require('./models/userGroup');
 
+const app = express();
+
+const accessLogStream=fs.createWriteStream(path.join(__dirname,'access.log'),{flags:'a'});
+
+app.use(helmet({contentSecurityPolicy: false}));  
+app.use(morgan('combined',{stream:accessLogStream}));
+ 
 app.use(cors(
     {
         origin:"http://127.0.0.1:5500"
@@ -21,11 +30,15 @@ app.use(cors(
 ));
 
 app.use(bodyParser.json());
-// app.use(express.static(path.join(__dirname, 'public')));
+
 
 app.use('/user',userRoute);
 app.use('/message',messageRoute);
 app.use('/group',groupRoute);
+
+app.use((req,res)=>{
+    res.sendFile(path.join(__dirname,`public/${req.url}`));
+  });
 
 User.hasMany(Message);
 Message.belongsTo(User);
