@@ -39,7 +39,7 @@ async function getmessages(){
                 msgId=element.id;
              }); 
         } 
-        const allMsgs=await axios.get(`http://localhost:3100/message/get-message?lastMsgID=${msgId}`);
+        const allMsgs=await axios.get(`http://13.49.238.207:3100/message/get-message?lastMsgID=${msgId}`);
         if(parsedMsgs.length>0 && allMsgs.data.messageData.length>0){
             mergedArrays=parsedMsgs.concat(allMsgs.data.messageData);
         }
@@ -64,13 +64,13 @@ async function getmessages(){
 }
 window.addEventListener("DOMContentLoaded",async()=>{
     const token=localStorage.getItem('token');
-    // const allMsgs=await axios.get(`http://localhost:3100/message/get-message?lastMsgID=0`);
+    // const allMsgs=await axios.get(`http://13.49.238.207:3100/message/get-message?lastMsgID=0`);
     // const msgString=JSON.stringify(allMsgs.data.messageData);
     // localStorage.setItem('msgs',msgString);
     // for(var i=0;i<allMsgs.data.messageData.length;i++)
     //         await showmsg(allMsgs.data.messageData[i]);
     
-    const response=await axios.get("http://localhost:3100/group/get-group",{headers:{"Authorization":token}});
+    const response=await axios.get("http://13.49.238.207:3100/group/get-group",{headers:{"Authorization":token}});
     // console.log(response);
     for(var i=0;i<response.data.groupData.length;i++)
             await showgrps(response.data.groupData[i]);
@@ -92,7 +92,7 @@ async function formSubmit(e){
         let obj={
             messageData,groupId
         }
-        const response=await axios.post("http://localhost:3100/message/add-message",obj,{headers:{"Authorization":token}})
+        const response=await axios.post("http://13.49.238.207:3100/message/add-message",obj,{headers:{"Authorization":token}})
         if(msgArray!=null){
             msgArrayParsed.push(response.data.messageData);
             msgStringArray=JSON.stringify(msgArrayParsed);
@@ -122,7 +122,7 @@ async function showmsg(obj){
              text=document.createTextNode("You"+":"+obj.message);    
         }
         else{
-             const user=await axios.get(`http://localhost:3100/user/${obj.userId}`);
+             const user=await axios.get(`http://13.49.238.207:3100/user/${obj.userId}`);
              text=document.createTextNode(user.data.userData.name+":"+obj.message);    
         }
         addNewelem.appendChild(text);
@@ -143,7 +143,7 @@ async function AddGroup(e){
     let obj={
         groupName
     }
-    const response=await axios.post("http://localhost:3100/group/add-group",obj,{headers:{"Authorization":token}});
+    const response=await axios.post("http://13.49.238.207:3100/group/add-group",obj,{headers:{"Authorization":token}});
     // console.log(response.data.groupData);
     showgrps(response.data.groupData);
     
@@ -189,7 +189,7 @@ async function showgrps(myobj){
                 const gId=localStorage.getItem('groupId');
                 e.target.PhoneNo.value="";
                 // console.log(phoneNo);
-                const addMember=await axios.get(`http://localhost:3100/group/add-user?phoneNo=${phoneNo}&groupId=${gId}`);
+                const addMember=await axios.get(`http://13.49.238.207:3100/group/add-user?phoneNo=${phoneNo}&groupId=${gId}`);
                 memberForm.innerHTML+=`<h5 class="text-center" style="color:green;">User Added</h5>`
                 setTimeout(()=>{
                    memberForm.setAttribute("style", "display:none;");
@@ -206,13 +206,13 @@ async function showgrps(myobj){
                 localStorage.setItem('groupId',myobj.id);
                 const token=localStorage.getItem('token');
                 const groupId=myobj.id;
-                const allMsgs=await axios.get(`http://localhost:3100/message/get-message/${groupId}`,{headers:{"Authorization":token}});
+                const allMsgs=await axios.get(`http://13.49.238.207:3100/message/get-message/${groupId}`,{headers:{"Authorization":token}});
                 const msgString=JSON.stringify(allMsgs.data.messageData);
                 localStorage.setItem('msgs',msgString);
                 chatList.innerHTML='';
                 for(var i=0;i<allMsgs.data.messageData.length;i++)
                     await showmsg(allMsgs.data.messageData[i]);
-                const grpMembers=await axios.get(`http://localhost:3100/group/get-members/${groupId}`);
+                const grpMembers=await axios.get(`http://13.49.238.207:3100/group/get-members/${groupId}`);
                 memberList.innerHTML='';
                 for(var i=0;i<grpMembers.data.members.length;i++)
                     await showMembers(grpMembers.data.members[i]);
@@ -248,7 +248,7 @@ async function showMembers(obj){
         const decodedtoken=parseJwt (token);
         const gId=localStorage.getItem('groupId');
         // console.log(decodedtoken);
-        const isAdmin=await axios.get(`http://localhost:3100/group/isAdmin?userId=${decodedtoken.userId}&groupId=${gId}`);
+        const isAdmin=await axios.get(`http://13.49.238.207:3100/group/isAdmin?userId=${decodedtoken.userId}&groupId=${gId}`);
         if(isAdmin.data.Data.isAdmin){
 
             const removeUser=document.createElement('button');
@@ -262,7 +262,7 @@ async function showMembers(obj){
             addNewelem.appendChild(makeAdmin);
         
             const gId=localStorage.getItem('groupId');
-            const Adminperm=await axios.get(`http://localhost:3100/group/isAdmin?userId=${obj.id}&groupId=${gId}`);
+            const Adminperm=await axios.get(`http://13.49.238.207:3100/group/isAdmin?userId=${obj.id}&groupId=${gId}`);
             if(Adminperm.data.Data.isAdmin){
                 addNewelem.removeChild(makeAdmin);
                 const removeAdmin=document.createElement('button');
@@ -272,18 +272,18 @@ async function showMembers(obj){
 
                 removeAdmin.addEventListener('click',async()=>{
                     const gId=localStorage.getItem('groupId');
-                    const noAdmin=await axios.get(`http://localhost:3100/group/removeAdmin?userId=${obj.id}&groupId=${gId}`);
+                    const noAdmin=await axios.get(`http://13.49.238.207:3100/group/removeAdmin?userId=${obj.id}&groupId=${gId}`);
                 });
             }
 
         makeAdmin.addEventListener('click',async()=>{
             const gId=localStorage.getItem('groupId');
-            const makeAdmin=await axios.get(`http://localhost:3100/group/makeAdmin?userId=${obj.id}&groupId=${gId}`);
+            const makeAdmin=await axios.get(`http://13.49.238.207:3100/group/makeAdmin?userId=${obj.id}&groupId=${gId}`);
         });
 
         removeUser.addEventListener('click',async()=>{
             const gId=localStorage.getItem('groupId');
-            const removeMember=await axios.get(`http://localhost:3100/group/remove-user?userId=${obj.id}&groupId=${gId}`);
+            const removeMember=await axios.get(`http://13.49.238.207:3100/group/remove-user?userId=${obj.id}&groupId=${gId}`);
         });
         }
         memberList.appendChild(addNewelem);

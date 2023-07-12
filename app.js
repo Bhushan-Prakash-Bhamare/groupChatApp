@@ -24,9 +24,9 @@ app.use(helmet({contentSecurityPolicy: false}));
 app.use(morgan('combined',{stream:accessLogStream}));
  
 app.use(cors(
-    {
-        origin:"http://127.0.0.1:5500"
-    }
+    // {
+    //     origin:"http://127.0.0.1:5500"
+    // }
 ));
 
 app.use(bodyParser.json());
