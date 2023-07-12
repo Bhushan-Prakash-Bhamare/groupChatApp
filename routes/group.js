@@ -6,6 +6,14 @@ const router = express.Router();
 
 router.get('/add-user',groupController.adduser);
 
+router.get('/remove-user',groupController.removeuser);
+
+router.get('/makeAdmin',groupController.makeAdmin);
+
+router.get('/removeAdmin',groupController.removeAdmin);
+
+router.get('/isAdmin',groupController.isAdmin);
+
 router.get('/get-members/:groupId',groupController.getmembers)
 
 router.get('/get-group',userauthentication.authenticate,groupController.getgroup);

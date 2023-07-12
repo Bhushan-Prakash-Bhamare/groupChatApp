@@ -15,9 +15,9 @@ const Group=require('./models/group');
 const UserGroup=require('./models/userGroup');
 
 app.use(cors(
-    // {
-    //     origin:"http://127.0.0.1:5500"
-    // }
+    {
+        origin:"http://127.0.0.1:5500"
+    }
 ));
 
 app.use(bodyParser.json());

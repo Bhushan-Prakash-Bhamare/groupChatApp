@@ -1,4 +1,4 @@
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 const groupModel=require('../models/group');
 const userGroupModel=require('../models/userGroup');
 const userModel=require('../models/user');
@@ -8,7 +8,7 @@ exports.addgroup=async(req,res,next)=>{
         const userId=req.user.id;
         const groupName=req.body.groupName;
         const data=await groupModel.create({name:groupName,createdBy:userId});
-        const usergroup=await userGroupModel.create({userId:userId,groupId:data.id});
+        const usergroup=await userGroupModel.create({userId:userId,groupId:data.id,isAdmin:true});
         res.status(201).json({groupData:data,success:true});
     }
     catch(err){ 
@@ -66,6 +66,54 @@ exports.getmembers=async(req,res,next)=>{
         // console.log(members);
         const users=await userModel.findAll({where:{id:{[Op.in]:members}}});
         res.status(201).json({members:users,success:true});
+    }
+    catch(err){ 
+        res.status(500).json({error:err,success:false});
+    }
+}
+
+exports.makeAdmin=async(req,res,next)=>{
+    try{
+        const userId=req.query.userId;
+        const gId=req.query.groupId;
+        const userGroup=await userGroupModel.update({isAdmin:true},{where:{userId:userId,groupId:gId}});
+        res.status(201).json({success:true});
+    }
+    catch(err){ 
+        res.status(500).json({error:err,success:false});
+    }
+}
+
+exports.removeAdmin=async(req,res,next)=>{
+    try{
+        const userId=req.query.userId;
+        const gId=req.query.groupId;
+        const userGroup=await userGroupModel.update({isAdmin:false},{where:{userId:userId,groupId:gId}});
+        res.status(201).json({success:true});
+    }
+    catch(err){ 
+        res.status(500).json({error:err,success:false});
+    }
+}
+
+exports.isAdmin=async(req,res,next)=>{
+    try{
+        const userId=req.query.userId;
+        const gId=req.query.groupId;
+        const userGroup=await userGroupModel.findOne({where:{userId:userId,groupId:gId}});
+        res.status(201).json({Data:userGroup,success:true});
+    }
+    catch(err){ 
+        res.status(500).json({error:err,success:false});
+    }
+}
+
+exports.removeuser=async(req,res,next)=>{
+    try{
+        const userId=req.query.userId;
+        const gId=req.query.groupId;
+        const userGroup=await userGroupModel.destroy({where:{userId:userId,groupId:gId}});
+        res.status(201).json({success:true});
     }
     catch(err){ 
         res.status(500).json({error:err,success:false});

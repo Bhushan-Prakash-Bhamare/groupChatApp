@@ -160,7 +160,7 @@ async function showgrps(myobj){
         addNewelem.appendChild(brTag);
 
         const addMemberbtn=document.createElement('button');
-        addMemberbtn.className='btn btn-danger btn-sm'
+        addMemberbtn.className='btn btn-primary btn-sm'
         addMemberbtn.appendChild(document.createTextNode('Add Member'));
         addNewelem.appendChild(addMemberbtn);
 
@@ -243,6 +243,49 @@ async function showMembers(obj){
         addNewelem.className="list-group-item bg-light";
         text=document.createTextNode(obj.name);    
         addNewelem.appendChild(text);
+
+        const token=localStorage.getItem('token');
+        const decodedtoken=parseJwt (token);
+        const gId=localStorage.getItem('groupId');
+        // console.log(decodedtoken);
+        const isAdmin=await axios.get(`http://localhost:3100/group/isAdmin?userId=${decodedtoken.userId}&groupId=${gId}`);
+        if(isAdmin.data.Data.isAdmin){
+
+            const removeUser=document.createElement('button');
+            removeUser.className='btn btn-danger btn-sm float-end'
+            removeUser.appendChild(document.createTextNode('Remove User'));
+            addNewelem.appendChild(removeUser);
+
+            const makeAdmin=document.createElement('button');
+            makeAdmin.className='btn btn-primary btn-sm float-end'
+            makeAdmin.appendChild(document.createTextNode('Make Admin'));
+            addNewelem.appendChild(makeAdmin);
+        
+            const gId=localStorage.getItem('groupId');
+            const Adminperm=await axios.get(`http://localhost:3100/group/isAdmin?userId=${obj.id}&groupId=${gId}`);
+            if(Adminperm.data.Data.isAdmin){
+                addNewelem.removeChild(makeAdmin);
+                const removeAdmin=document.createElement('button');
+                removeAdmin.className='btn btn-outline-danger btn-sm float-end'
+                removeAdmin.appendChild(document.createTextNode('Remove Admin Permisssion'));
+                addNewelem.appendChild(removeAdmin);
+
+                removeAdmin.addEventListener('click',async()=>{
+                    const gId=localStorage.getItem('groupId');
+                    const noAdmin=await axios.get(`http://localhost:3100/group/removeAdmin?userId=${obj.id}&groupId=${gId}`);
+                });
+            }
+
+        makeAdmin.addEventListener('click',async()=>{
+            const gId=localStorage.getItem('groupId');
+            const makeAdmin=await axios.get(`http://localhost:3100/group/makeAdmin?userId=${obj.id}&groupId=${gId}`);
+        });
+
+        removeUser.addEventListener('click',async()=>{
+            const gId=localStorage.getItem('groupId');
+            const removeMember=await axios.get(`http://localhost:3100/group/remove-user?userId=${obj.id}&groupId=${gId}`);
+        });
+        }
         memberList.appendChild(addNewelem);
     }
     catch(error){
