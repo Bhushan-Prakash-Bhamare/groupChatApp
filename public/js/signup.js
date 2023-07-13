@@ -25,7 +25,7 @@ async function formSubmit(e){
             password:e.target.password.value
         }
         
-        const response=await axios.post(`http://13.49.238.207:3100/user/signup`,details);
+        const response=await axios.post(`http://localhost:3100/user/signup`,details);
         if(response.status===201){ 
             alert('Successfuly signed up');
             window.location.href="../html/login.html" ; 

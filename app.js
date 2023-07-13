@@ -1,3 +1,4 @@
+require('dotenv').config();
 const path = require('path');
 const cors = require('cors');
 const express = require('express');
@@ -6,6 +7,9 @@ const sequelize=require('./util/database');
 const helmet=require('helmet');
 const morgan=require('morgan');
 const fs=require('fs');
+const socketio=require('socket.io');
+const http=require('http');
+const users={};
 
 const userRoute=require('./routes/user');
 const messageRoute=require('./routes/message');
@@ -17,6 +21,8 @@ const Group=require('./models/group');
 const UserGroup=require('./models/userGroup');
 
 const app = express();
+const server = http.createServer(app);
+const io = socketio(server);
 
 const accessLogStream=fs.createWriteStream(path.join(__dirname,'access.log'),{flags:'a'});
 
@@ -53,5 +59,18 @@ Group.belongsToMany(User,{through:UserGroup});
 sequelize
         .sync()
     // .sync({force:true})
-    .then(()=>app.listen(3100))
+    .then(()=>{
+      server.listen(process.env.PORT);
+      
+      io.on('connection', socket => {
+        socket.on('new-user', data => {
+          io.emit('user-connected', data);
+        })
+        socket.on('send-chat-message', data => {
+          socket.broadcast.emit('chat-message', data);
+        })
+      }) 
+    })
     .catch(err=>console.log(err));  
+     
+    
