@@ -33,7 +33,7 @@ async function formSubmit(e){
           password:e.target.password.value
       }
       
-      const response=await axios.post(`http://localhost:3100/user/login`,details);  
+      const response=await axios.post(`http://13.49.238.207:3100/user/login`,details);  
       localStorage.setItem('token',response.data.token);     
       window.location.href = "../html/chatapp.html"; 
       
