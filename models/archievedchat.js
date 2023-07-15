@@ -1,19 +1,22 @@
 const Sequelize = require('sequelize');
- 
+
 const sequelize = require('../util/database');
 
-const url = sequelize.define('files', {
+const messageData = sequelize.define('archieve', {
       id: {
         type: Sequelize.INTEGER,
-        autoIncrement: true, 
+        autoIncrement: true,
         allowNull: false,
         primaryKey: true
       },
-      url:{
+      message:{
         type: Sequelize.STRING,
+        allowNull: false,
+      },
+      userId: {
+        type: Sequelize.INTEGER,
         allowNull: false,
       }
 });
     
-  
-  module.exports = url;
+module.exports = messageData;

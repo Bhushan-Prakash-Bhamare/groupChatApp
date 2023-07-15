@@ -9,6 +9,7 @@ const morgan=require('morgan');
 const fs=require('fs');
 const socketio=require('socket.io');
 const http=require('http');
+const CronJob = require('cron').CronJob;
 
 const userRoute=require('./routes/user');
 const messageRoute=require('./routes/message');
@@ -18,10 +19,10 @@ const fileRoute=require('./routes/files');
 
 const User=require('./models/user');
 const Message=require('./models/message');
+const Archieve=require('./models/archievedchat');
 const Group=require('./models/group');
 const UserGroup=require('./models/userGroup');
 const forgotpassword=require('./models/forgotpwdreq');
-const files=require('./models/files');
 
 const app = express();
 const server = http.createServer(app);
@@ -60,7 +61,9 @@ Message.belongsTo(Group);
 User.belongsToMany(Group,{through:UserGroup});
 Group.belongsToMany(User,{through:UserGroup});
 
-
+User.hasMany(forgotpassword);
+forgotpassword.belongsTo(User); 
+  
 sequelize
         .sync()
     // .sync({force:true})
@@ -74,8 +77,27 @@ sequelize
         socket.on('send-chat-message', data => {
           socket.broadcast.emit('chat-message', data);
         })
-      }) 
+      })
+      
+      new CronJob(
+        '0 0 * * *',
+        async function() {
+           const chats=await Message.findAll();
+           console.log('per day chat',chats);
+
+          for(const chat of chats){
+            await Archieve.create({message:chat.message,userId:chat.userId,groupId:chat.groupId});
+            console.log('id',chat.id);
+            await Message.destroy({where:{id:chat.id}});
+          }
+        },
+        null,
+        true
+    );
+
     })
     .catch(err=>console.log(err));  
-     
+
+    
+    
     
